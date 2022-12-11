@@ -91,8 +91,7 @@ headOr _def (h :. _t) = h
 product ::
   List Int ->
   Int
-product Nil = 1
-product (h :. t) = h * product t
+product = foldRight (*) 1
 
 -- | Sum the elements of the list.
 --
@@ -106,8 +105,7 @@ product (h :. t) = h * product t
 sum ::
   List Int ->
   Int
-sum Nil = 0
-sum (h :. t) = h + sum t
+sum = foldRight (+) 0
 
 -- | Return the length of the list.
 --
@@ -118,8 +116,7 @@ sum (h :. t) = h + sum t
 length ::
   List a ->
   Int
-length Nil = 0
-length (_h :. t) = 1 + length t
+length l = sum $ map (const 1) l
 
 -- | Map the given function on each element of the list.
 --
@@ -172,8 +169,7 @@ filter f (h :. t) =
   List a ->
   List a ->
   List a
-(++) Nil b = b
-(++) (h :. t) b = h :. t ++ b
+(++) a b = foldRight (:.) b a
 
 infixr 5 ++
 
@@ -190,8 +186,7 @@ infixr 5 ++
 flatten ::
   List (List a) ->
   List a
-flatten Nil = Nil
-flatten (h :. t) = h ++ flatten t
+flatten = foldRight (++) Nil
 
 -- | Map a function then flatten to a list.
 --
@@ -207,8 +202,7 @@ flatMap ::
   (a -> List b) ->
   List a ->
   List b
-flatMap _f Nil = Nil
-flatMap f (h :. t) = f h ++ flatMap f t
+flatMap f = foldRight (\a b -> f a ++ b) Nil
 
 -- | Flatten a list of lists to a list (again).
 -- HOWEVER, this time use the /flatMap/ function that you just wrote.
@@ -242,10 +236,9 @@ seqOptional ::
   List (Optional a) ->
   Optional (List a)
 seqOptional Nil = Full Nil
-seqOptional (Empty :. _t) = Empty
-seqOptional (Full h :. t) = case seqOptional t of
-  Empty -> Empty
-  Full t' -> Full (h :. t')
+-- seqOptional (Empty :. _t) = Empty
+-- seqOptional (Full h :. t) = mapOptional (h :.) $ seqOptional t
+seqOptional (h :. t) = bindOptional (\h' -> mapOptional (h' :.) $ seqOptional t) h
 
 -- | Find the first element in the list matching the predicate.
 --
