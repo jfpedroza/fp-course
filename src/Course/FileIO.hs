@@ -79,52 +79,62 @@ the contents of c
 
 -}
 
+seqMap :: Applicative k => (a -> k b) -> List a -> k (List b)
+seqMap f list = sequence $ f <$> list
+
+ioSequence :: (a -> IO b) -> List a -> IO ()
+ioSequence f list = void $ seqMap f list
+
+printLines :: List Chars -> IO ()
+printLines = ioSequence putStrLn
+
 -- Given the file name, and file contents, print them.
 -- Use @putStrLn@.
 printFile ::
   FilePath ->
   Chars ->
   IO ()
-printFile =
-  error "todo: Course.FileIO#printFile"
+printFile name contents = printLines $ ("============ " ++ name) :. contents :. Nil
 
 -- Given a list of (file name and file contents), print each.
 -- Use @printFile@.
 printFiles ::
   List (FilePath, Chars) ->
   IO ()
-printFiles =
-  error "todo: Course.FileIO#printFiles"
+printFiles = ioSequence printF
+  where
+    printF (path, contents) = printFile path contents
 
 -- Given a file name, return (file name and file contents).
 -- Use @readFile@.
 getFile ::
   FilePath ->
   IO (FilePath, Chars)
-getFile =
-  error "todo: Course.FileIO#getFile"
+getFile filePath = makeTuple <$> readFile filePath
+  where
+    makeTuple c = (filePath, c)
 
 -- Given a list of file names, return list of (file name and file contents).
 -- Use @getFile@.
 getFiles ::
   List FilePath ->
   IO (List (FilePath, Chars))
-getFiles =
-  error "todo: Course.FileIO#getFiles"
+getFiles = seqMap getFile
 
 -- Given a file name, read it and for each line in that file, read and print contents of each.
 -- Use @getFiles@, @lines@, and @printFiles@.
 run ::
   FilePath ->
   IO ()
-run =
-  error "todo: Course.FileIO#run"
+run filePath = readFile filePath >>= getFiles . lines >>= printFiles
+
+getFirstArg :: List Chars -> Chars
+getFirstArg = headOr (error "Arg is missing")
 
 -- /Tip:/ use @getArgs@ and @run@
 main ::
   IO ()
-main =
-  error "todo: Course.FileIO#main"
+main = getArgs >>= run . getFirstArg
 
 ----
 
