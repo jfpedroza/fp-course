@@ -5,5 +5,5 @@ let
   inherit (nixpkgs) pkgs;
 in
 pkgs.mkShell {
-  buildInputs = with pkgs.haskellPackages; [ ghc ghcid ];
+  buildInputs = with pkgs.haskellPackages; [ ghc ghcid haskell-language-server ];
 }
