@@ -1,18 +1,18 @@
-{-# LANGUAGE NoImplicitPrelude #-}
-{-# LANGUAGE ScopedTypeVariables #-}
 {-# LANGUAGE InstanceSigs #-}
-{-# LANGUAGE RebindableSyntax #-}
 {-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE RebindableSyntax #-}
+{-# LANGUAGE ScopedTypeVariables #-}
+{-# LANGUAGE NoImplicitPrelude #-}
 
 module Course.StateT where
 
+import Course.Applicative
 import Course.Core
 import Course.ExactlyOne
-import Course.Optional
-import Course.List
 import Course.Functor
-import Course.Applicative
+import Course.List
 import Course.Monad
+import Course.Optional
 import Course.State
 import qualified Data.Set as S
 import qualified Prelude as P
@@ -23,16 +23,16 @@ import qualified Prelude as P
 -- >>> instance Arbitrary a => Arbitrary (List a) where arbitrary = P.fmap listh arbitrary
 
 -- | A `StateT` is a function from a state value `s` to a functor k of (a produced value `a`, and a resulting state `s`).
-newtype StateT s k a =
-  StateT (
-    s
-    -> k (a, s)
-  )
+newtype StateT s k a
+  = StateT
+      ( s ->
+        k (a, s)
+      )
 
 runStateT ::
-  StateT s k a
-  -> s
-  -> k (a, s)
+  StateT s k a ->
+  s ->
+  k (a, s)
 runStateT (StateT f) =
   f
 
@@ -42,9 +42,9 @@ runStateT (StateT f) =
 -- [(3,0)]
 instance Functor k => Functor (StateT s k) where
   (<$>) ::
-    (a -> b)
-    -> StateT s k a
-    -> StateT s k b
+    (a -> b) ->
+    StateT s k a ->
+    StateT s k b
   (<$>) =
     error "todo: Course.StateT (<$>)#instance (StateT s k)"
 
@@ -66,14 +66,14 @@ instance Functor k => Functor (StateT s k) where
 -- [(4,[0,1,2]),(5,[0,1,2])]
 instance Monad k => Applicative (StateT s k) where
   pure ::
-    a
-    -> StateT s k a
+    a ->
+    StateT s k a
   pure =
     error "todo: Course.StateT pure#instance (StateT s k)"
   (<*>) ::
-    StateT s k (a -> b)
-    -> StateT s k a
-    -> StateT s k b
+    StateT s k (a -> b) ->
+    StateT s k a ->
+    StateT s k b
   (<*>) =
     error "todo: Course.StateT (<*>)#instance (StateT s k)"
 
@@ -87,9 +87,9 @@ instance Monad k => Applicative (StateT s k) where
 -- ((),16)
 instance Monad k => Monad (StateT s k) where
   (=<<) ::
-    (a -> StateT s k b)
-    -> StateT s k a
-    -> StateT s k b
+    (a -> StateT s k b) ->
+    StateT s k a ->
+    StateT s k b
   (=<<) =
     error "todo: Course.StateT (=<<)#instance (StateT s k)"
 
@@ -102,8 +102,8 @@ type State' s a =
 -- >>> runStateT (state' $ runState $ put 1) 0
 -- ExactlyOne ((),1)
 state' ::
-  (s -> (a, s))
-  -> State' s a
+  (s -> (a, s)) ->
+  State' s a
 state' =
   error "todo: Course.StateT#state'"
 
@@ -112,9 +112,9 @@ state' =
 -- >>> runState' (state' $ runState $ put 1) 0
 -- ((),1)
 runState' ::
-  State' s a
-  -> s
-  -> (a, s)
+  State' s a ->
+  s ->
+  (a, s)
 runState' =
   error "todo: Course.StateT#runState'"
 
@@ -124,9 +124,9 @@ runState' =
 -- Full 3
 execT ::
   Functor k =>
-  StateT s k a
-  -> s
-  -> k s
+  StateT s k a ->
+  s ->
+  k s
 execT =
   error "todo: Course.StateT#execT"
 
@@ -135,9 +135,9 @@ execT =
 -- >>> exec' (state' $ \s -> ((), s + 1)) 2
 -- 3
 exec' ::
-  State' s a
-  -> s
-  -> s
+  State' s a ->
+  s ->
+  s
 exec' =
   error "todo: Course.StateT#exec'"
 
@@ -147,9 +147,9 @@ exec' =
 -- Full True
 evalT ::
   Functor k =>
-  StateT s k a
-  -> s
-  -> k a
+  StateT s k a ->
+  s ->
+  k a
 evalT =
   error "todo: Course.StateT#evalT"
 
@@ -158,9 +158,9 @@ evalT =
 -- >>> eval' (state' $ \s -> (even s, s + 1)) 5
 -- False
 eval' ::
-  State' s a
-  -> s
-  -> a
+  State' s a ->
+  s ->
+  a
 eval' =
   error "todo: Course.StateT#eval'"
 
@@ -183,8 +183,8 @@ getT =
 -- [((),2)]
 putT ::
   Applicative k =>
-  s
-  -> StateT s k ()
+  s ->
+  StateT s k ()
 putT =
   error "todo: Course.StateT#putT"
 
@@ -195,8 +195,8 @@ putT =
 -- prop> \xs -> distinct' xs == distinct' (flatMap (\x -> x :. x :. Nil) xs)
 distinct' ::
   Ord a =>
+  List a ->
   List a
-  -> List a
 distinct' =
   error "todo: Course.StateT#distinct'"
 
@@ -213,15 +213,14 @@ distinct' =
 -- Empty
 distinctF ::
   (Ord a, Num a) =>
-  List a
-  -> Optional (List a)
+  List a ->
+  Optional (List a)
 distinctF =
   error "todo: Course.StateT#distinctF"
 
 -- | An `OptionalT` is a functor of an `Optional` value.
-data OptionalT k a =
-  OptionalT {
-    runOptionalT ::
+data OptionalT k a = OptionalT
+  { runOptionalT ::
       k (Optional a)
   }
 
@@ -231,9 +230,9 @@ data OptionalT k a =
 -- [Full 2,Empty]
 instance Functor k => Functor (OptionalT k) where
   (<$>) ::
-    (a -> b)
-    -> OptionalT k a
-    -> OptionalT k b
+    (a -> b) ->
+    OptionalT k a ->
+    OptionalT k b
   (<$>) =
     error "todo: Course.StateT (<$>)#instance (OptionalT k)"
 
@@ -263,15 +262,15 @@ instance Functor k => Functor (OptionalT k) where
 -- [Full 2,Empty,Full 3,Empty]
 instance Monad k => Applicative (OptionalT k) where
   pure ::
-    a
-    -> OptionalT k a
+    a ->
+    OptionalT k a
   pure =
     error "todo: Course.StateT pure#instance (OptionalT k)"
 
   (<*>) ::
-    OptionalT k (a -> b)
-    -> OptionalT k a
-    -> OptionalT k b
+    OptionalT k (a -> b) ->
+    OptionalT k a ->
+    OptionalT k b
   (<*>) =
     error "todo: Course.StateT (<*>)#instance (OptionalT k)"
 
@@ -281,15 +280,15 @@ instance Monad k => Applicative (OptionalT k) where
 -- [Full 2,Full 3,Empty]
 instance Monad k => Monad (OptionalT k) where
   (=<<) ::
-    (a -> OptionalT k b)
-    -> OptionalT k a
-    -> OptionalT k b
+    (a -> OptionalT k b) ->
+    OptionalT k a ->
+    OptionalT k b
   (=<<) =
     error "todo: Course.StateT (=<<)#instance (OptionalT k)"
 
 -- | A `Logger` is a pair of a list of log values (`[l]`) and an arbitrary value (`a`).
-data Logger l a =
-  Logger (List l) a
+data Logger l a
+  = Logger (List l) a
   deriving (Eq, Show)
 
 -- | Implement the `Functor` instance for `Logger
@@ -298,9 +297,9 @@ data Logger l a =
 -- Logger [1,2] 6
 instance Functor (Logger l) where
   (<$>) ::
-    (a -> b)
-    -> Logger l a
-    -> Logger l b
+    (a -> b) ->
+    Logger l a ->
+    Logger l b
   (<$>) =
     error "todo: Course.StateT (<$>)#instance (Logger l)"
 
@@ -313,15 +312,15 @@ instance Functor (Logger l) where
 -- Logger [1,2,3,4] 10
 instance Applicative (Logger l) where
   pure ::
-    a
-    -> Logger l a
+    a ->
+    Logger l a
   pure =
     error "todo: Course.StateT pure#instance (Logger l)"
 
   (<*>) ::
-    Logger l (a -> b)
-    -> Logger l a
-    -> Logger l b
+    Logger l (a -> b) ->
+    Logger l a ->
+    Logger l b
   (<*>) =
     error "todo: Course.StateT (<*>)#instance (Logger l)"
 
@@ -332,9 +331,9 @@ instance Applicative (Logger l) where
 -- Logger [1,2,4,5] 6
 instance Monad (Logger l) where
   (=<<) ::
-    (a -> Logger l b)
-    -> Logger l a
-    -> Logger l b
+    (a -> Logger l b) ->
+    Logger l a ->
+    Logger l b
   (=<<) =
     error "todo: Course.StateT (=<<)#instance (Logger l)"
 
@@ -343,9 +342,9 @@ instance Monad (Logger l) where
 -- >>> log1 1 2
 -- Logger [1] 2
 log1 ::
-  l
-  -> a
-  -> Logger l a
+  l ->
+  a ->
+  Logger l a
 log1 =
   error "todo: Course.StateT#log1"
 
@@ -365,16 +364,16 @@ log1 =
 -- Logger ["even number: 2","even number: 2","even number: 6","aborting > 100: 106"] Empty
 distinctG ::
   (Integral a, Show a) =>
-  List a
-  -> Logger Chars (Optional (List a))
+  List a ->
+  Logger Chars (Optional (List a))
 distinctG =
   error "todo: Course.StateT#distinctG"
 
 onFull ::
   Applicative k =>
-  (t -> k (Optional a))
-  -> Optional t
-  -> k (Optional a)
+  (t -> k (Optional a)) ->
+  Optional t ->
+  k (Optional a)
 onFull g o =
   case o of
     Empty ->

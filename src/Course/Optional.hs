@@ -1,5 +1,5 @@
-{-# LANGUAGE NoImplicitPrelude #-}
 {-# LANGUAGE ScopedTypeVariables #-}
+{-# LANGUAGE NoImplicitPrelude #-}
 
 module Course.Optional where
 
@@ -11,8 +11,8 @@ import qualified Prelude as P
 -- | The `Optional` data type contains 0 or 1 value.
 --
 -- It might be thought of as a list, with a maximum length of one.
-data Optional a =
-  Full a
+data Optional a
+  = Full a
   | Empty
   deriving (Eq, Show)
 
@@ -24,9 +24,9 @@ data Optional a =
 -- >>> fullOr 99 Empty
 -- 99
 fullOr ::
+  a ->
+  Optional a ->
   a
-  -> Optional a
-  -> a
 fullOr _ (Full a) = a
 fullOr def Empty = def
 
@@ -38,9 +38,9 @@ fullOr def Empty = def
 -- >>> mapOptional (+1) (Full 8)
 -- Full 9
 mapOptional ::
-  (a -> b)
-  -> Optional a
-  -> Optional b
+  (a -> b) ->
+  Optional a ->
+  Optional b
 mapOptional f (Full a) = Full (f a)
 mapOptional _ Empty = Empty
 
@@ -55,9 +55,9 @@ mapOptional _ Empty = Empty
 -- >>> bindOptional (\n -> if even n then Full (n - 1) else Full (n + 1)) (Full 9)
 -- Full 10
 bindOptional ::
-  (a -> Optional b)
-  -> Optional a
-  -> Optional b
+  (a -> Optional b) ->
+  Optional a ->
+  Optional b
 bindOptional f (Full a) = f a
 bindOptional _ Empty = Empty
 
@@ -76,9 +76,9 @@ bindOptional _ Empty = Empty
 -- >>> Empty <+> Empty
 -- Empty
 (<+>) ::
+  Optional a ->
+  Optional a ->
   Optional a
-  -> Optional a
-  -> Optional a
 (<+>) (Full a) _ = Full a
 (<+>) Empty b = b
 
@@ -90,10 +90,10 @@ bindOptional _ Empty = Empty
 -- >>> optional (+1) 0 Empty
 -- 0
 optional ::
-  (a -> b)
-  -> b
-  -> Optional a
-  -> b
+  (a -> b) ->
+  b ->
+  Optional a ->
+  b
 optional f _ (Full a) = f a
 optional _ b Empty = b
 

@@ -1,6 +1,6 @@
-{-# LANGUAGE NoImplicitPrelude #-}
-{-# LANGUAGE ScopedTypeVariables #-}
 {-# LANGUAGE InstanceSigs #-}
+{-# LANGUAGE ScopedTypeVariables #-}
+{-# LANGUAGE NoImplicitPrelude #-}
 
 module Course.Contravariant where
 
@@ -12,9 +12,9 @@ import Course.Core
 data Predicate a = Predicate (a -> Bool)
 
 runPredicate ::
-  Predicate a
-  -> a
-  -> Bool
+  Predicate a ->
+  a ->
+  Bool
 runPredicate (Predicate f) =
   f
 
@@ -25,10 +25,10 @@ runPredicate (Predicate f) =
 data Comparison a = Comparison (a -> a -> Ordering)
 
 runComparison ::
-  Comparison a
-  -> a
-  -> a
-  -> Ordering
+  Comparison a ->
+  a ->
+  a ->
+  Ordering
 runComparison (Comparison f) =
   f
 
@@ -37,9 +37,9 @@ runComparison (Comparison f) =
 data SwappedArrow a b = SwappedArrow (b -> a)
 
 runSwappedArrow ::
-  SwappedArrow a b
-  -> b
-  -> a
+  SwappedArrow a b ->
+  b ->
+  a
 runSwappedArrow (SwappedArrow f) = f
 
 -- | All instances of the `Contravariant` type-class must satisfy two
@@ -59,9 +59,9 @@ runSwappedArrow (SwappedArrow f) = f
 class Contravariant k where
   -- Pronounced, contramap.
   (>$<) ::
-    (b -> a)
-    -> k a
-    -> k b
+    (b -> a) ->
+    k a ->
+    k b
 
 infixl 4 >$<
 
@@ -76,9 +76,9 @@ infixl 4 >$<
 -- False
 instance Contravariant Predicate where
   (>$<) ::
-    (b -> a)
-    -> Predicate a
-    -> Predicate b
+    (b -> a) ->
+    Predicate a ->
+    Predicate b
   (>$<) =
     error "todo: Course.Contravariant (>$<)#instance Predicate"
 
@@ -88,9 +88,9 @@ instance Contravariant Predicate where
 -- GT
 instance Contravariant Comparison where
   (>$<) ::
-    (b -> a)
-    -> Comparison a
-    -> Comparison b
+    (b -> a) ->
+    Comparison a ->
+    Comparison b
   (>$<) =
     error "todo: Course.Contravariant (>$<)#instance Comparison"
 
@@ -103,12 +103,11 @@ instance Contravariant Comparison where
 -- 15
 instance Contravariant (SwappedArrow t) where
   (>$<) ::
-    (b -> a)
-    -> SwappedArrow x a
-    -> SwappedArrow x b
+    (b -> a) ->
+    SwappedArrow x a ->
+    SwappedArrow x b
   (>$<) =
     error "todo: Course.Contravariant (>$<)#instance SwappedArrow"
-
 
 -- | If we give our 'Contravariant' an @a@, then we can "accept" any
 -- @b@ by ignoring it.
@@ -116,8 +115,8 @@ instance Contravariant (SwappedArrow t) where
 -- prop> \x -> runPredicate (3 >$ Predicate odd) x == True
 (>$) ::
   Contravariant k =>
-  a
-  -> k a
-  -> k b
+  a ->
+  k a ->
+  k b
 (>$) =
   error "todo: Course.Contravariant#(>$)"
