@@ -151,12 +151,8 @@ findM ::
   (a -> f Bool) ->
   List a ->
   f (Optional a)
-findM f l =
-  let filtered = filtering f l
-      head l' = case l' of
-        Nil -> Empty
-        h :. _t -> Full h
-   in head <$> filtered
+findM _f Nil = pure Empty
+findM f (h :. t) = f h >>= (\pass -> if pass then pure (Full h) else findM f t)
 
 -- | Find the first element in a `List` that repeats.
 -- It is possible that no element repeats, hence an `Optional` result.
@@ -172,8 +168,9 @@ firstRepeat ::
   Ord a =>
   List a ->
   Optional a
-firstRepeat =
-  error "todo: Course.State#firstRepeat"
+firstRepeat l =
+  let p x = (\set -> const (pure (S.member x set)) =<< put (S.insert x set)) =<< get
+   in eval (findM p l) S.empty
 
 -- | Remove all duplicate elements in a `List`.
 -- /Tip:/ Use `filtering` and `State` with a @Data.Set#Set@.
@@ -185,8 +182,9 @@ distinct ::
   Ord a =>
   List a ->
   List a
-distinct =
-  error "todo: Course.State#distinct"
+distinct l =
+  let p x = (\set -> const (pure (S.notMember x set)) =<< put (S.insert x set)) =<< get
+   in eval (filtering p l) S.empty
 
 -- | A happy number is a positive integer, where the sum of the square of its digits eventually reaches 1 after repetition.
 -- In contrast, a sad number (not a happy number) is where the sum of the square of its digits never reaches 1
@@ -212,5 +210,8 @@ distinct =
 isHappy ::
   Integer ->
   Bool
-isHappy =
-  error "todo: Course.State#isHappy"
+isHappy i =
+  let digits = listh . show
+      f x = toInteger $ sum $ join (*) . digitToInt <$> digits x
+      l = produce f i
+   in contains 1 $ firstRepeat l
