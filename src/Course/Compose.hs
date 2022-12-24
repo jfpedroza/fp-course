@@ -20,20 +20,17 @@ instance
   (Functor f, Functor g) =>
   Functor (Compose f g)
   where
-  (<$>) =
-    error "todo: Course.Compose (<$>)#instance (Compose f g)"
+  (<$>) f (Compose c) = Compose $ (f <$>) <$> c
 
 instance
   (Applicative f, Applicative g) =>
   Applicative (Compose f g)
   where
   -- Implement the pure function for an Applicative instance for Compose
-  pure =
-    error "todo: Course.Compose pure#instance (Compose f g)"
+  pure = Compose . pure . pure
 
   -- Implement the (<*>) function for an Applicative instance for Compose
-  (<*>) =
-    error "todo: Course.Compose (<*>)#instance (Compose f g)"
+  (<*>) (Compose cf) (Compose cv) = Compose $ lift2 (<*>) cf cv
 
 instance
   (Monad f, Monad g) =>
@@ -51,5 +48,4 @@ instance
   Contravariant (Compose f g)
   where
   -- Implement the (>$<) function for a Contravariant instance for Compose
-  (>$<) =
-    error "todo: Course.Compose (>$<)#instance (Compose f g)"
+  (>$<) f (Compose a) = Compose $ (f >$<) <$> a
