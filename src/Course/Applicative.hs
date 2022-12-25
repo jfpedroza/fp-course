@@ -311,8 +311,7 @@ sequence ::
   Applicative k =>
   List (k a) ->
   k (List a)
-sequence Nil = pure Nil
-sequence (h :. t) = lift2 (:.) h $ sequence t
+sequence = foldRight (lift2 (:.)) (pure Nil)
 
 -- | Replicate an effect a given number of times.
 --
