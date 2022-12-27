@@ -412,3 +412,15 @@ betweenSepbyComma ::
   Parser a ->
   Parser (List a)
 betweenSepbyComma o c p = betweenCharTok o c (sepby p (charTok ','))
+
+-- Try the first parser, if it fails return an empty parser, otherwise run the second parser
+(&&?) :: Parser (List a) -> Parser (List a) -> Parser (List a)
+p1 &&? p2 =
+  P
+    ( \i -> case parse p1 i of
+        Result i' a ->
+          (a ++) <$> parse p2 i'
+        _ -> Result i Nil
+    )
+
+infixl 3 &&?

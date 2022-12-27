@@ -70,7 +70,12 @@ jsonNumberTest =
   , testCase "positive decimal" $ parse jsonNumber "123.45" @?= Result "" (2469 % 20)
   , testCase "negative whole (2)" $ parse jsonNumber "-123" @?= Result "" ((-123) % 1)
   , testCase "negative decimal" $ parse jsonNumber "-123.45" @?= Result "" ((-2469) % 20)
+  , testCase "positive whole with exp" $ parse jsonNumber "234e10" @?= Result "" (2340000000000 % 1)
+  , testCase "positive whole with exp +" $ parse jsonNumber "234E+2" @?= Result "" (23400 % 1)
+  , testCase "positive whole with exp -" $ parse jsonNumber "234.5e-1" @?= Result "" (2345 % 100)
   , testCase "negative sign on its own is error" $ isErrorResult (parse jsonNumber "-") @?= True
+  , testCase "decimal dot without following digits is error" $ isErrorResult (parse jsonNumber "234.") @?= True
+  , testCase "exp without following digits is error" $ isErrorResult (parse jsonNumber "123e") @?= True
   , testCase "alphabetic characters is error" $ isErrorResult (parse jsonNumber "abc") @?= True
   ]
 

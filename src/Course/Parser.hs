@@ -321,6 +321,14 @@ space = satisfy isSpace
 
 infixr 5 .:.
 
+(+++) ::
+  Parser (List a) ->
+  Parser (List a) ->
+  Parser (List a)
+(+++) = lift2 (++)
+
+infixr 5 +++
+
 -- | Return a parser that continues producing a list of values from the given parser.
 --
 -- /Tip:/ Use @list1@, @pure@ and @(|||)@.
@@ -496,7 +504,7 @@ firstNameParser = upper .:. list lower
 -- True
 surnameParser ::
   Parser Chars
-surnameParser = (++) <$> (upper .:. thisMany 5 lower) <*> list lower
+surnameParser = (upper .:. thisMany 5 lower) +++ list lower
 
 -- | Write a parser for Person.smoker.
 --
