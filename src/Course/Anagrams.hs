@@ -33,7 +33,7 @@ anagrams ::
   IO (List Chars)
 anagrams str path =
   let perms = permutations str
-      present w = intersectBy (==) w perms
+      present w = intersectBy equalIgnoringCase w perms
    in present . lines <$> readFile path
 
 -- Compare two strings for equality, ignoring case
